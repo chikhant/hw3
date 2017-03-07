@@ -79,7 +79,7 @@ __global__ void kernel2 (dtype *input, dtype *output, unsigned int n)
 		{
 			if (threadIdx.x + (blockDim.x / s) < blockDim.x)
 			{
-				scratch[threadIdx.x] += scratch[threadIdx.x + (blockDim.x / s)];
+				scratch[threadIdx.x] += scratch[threadIdx.x + (blockDim.x / (2 * s))];
 			}
 		}
 
