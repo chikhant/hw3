@@ -1,8 +1,10 @@
 Code Analysis
+=============
 
 Part 1)
-  The data we recieved from running cuda.sh is below. effective bandwidth is being calculated on this line of code in naive.cu: double bw = (N * sizeof(dtype)) / (t_kernel_0 * 1e9);
-  N is the size of the data, dtype is the datatype and it is divided by t_kernel_0 which is the time to execute the naive GPU reduction kernel * 1000000000. 
+The data we recieved from running cuda.sh is below. Effective bandwidth is being calculated on this line of code in naive.cu:
+	double bw = (N * sizeof(dtype)) / (t_kernel_0 * 1e9);
+`N` is the size of the data, `dtype` is the datatype and it is divided by `t_kernel_0` which is the time to execute the naive GPU reduction kernel * 1000000000.
 
 === Running 5 trials of naive ... ===
 *** Trial 1 ***
@@ -53,7 +55,7 @@ SUCCESS: GPU: 41.955299 	CPU: 41.955299
 
 
 Part 2)
-The following are the trial runs for stride.cu. This new model is about .0011 seconds quicker. Effective bandwidth has increased from around 10 GB/s to 15 GB/s
+The following are the trial runs for stride.cu. This new model is about .0011 seconds quicker. Effective bandwidth has increased from around 10 GB/s to 15 GB/s.
 
 === Running 5 trials of naive ... ===
 *** Trial 1 ***
@@ -99,7 +101,13 @@ SUCCESS: GPU: 41.939648  CPU: 41.939644
 
 === Done! ===
 
+
+
+
+
 Part 3)
+
+
 Part 4)
 Part 5)
 Part 6)
