@@ -1,0 +1,42 @@
+Script began: Tue Mar 7 21:15:21 PST 2017
+Node: compute-1-14.local
+Current directory: /data/users/chikhant/hw3
+
+=== Running 5 trials of naive ... ===
+*** Trial 1 ***
+N: 8388608
+Timer: gettimeofday
+Timer resolution: ~ 1 us (?)
+Time to execute first add GPU reduction kernel: 5.8e-05 secs
+Effective bandwidth: 578.52 GB/s
+unspecified launch failure in first_add.cu at line 182
+*** Trial 2 ***
+N: 8388608
+Timer: gettimeofday
+Timer resolution: ~ 1 us (?)
+Time to execute first add GPU reduction kernel: 2.4e-05 secs
+Effective bandwidth: 1398.10 GB/s
+unspecified launch failure in first_add.cu at line 182
+*** Trial 3 ***
+N: 8388608
+Timer: gettimeofday
+Timer resolution: ~ 1 us (?)
+Time to execute first add GPU reduction kernel: 2.4e-05 secs
+Effective bandwidth: 1398.10 GB/s
+unspecified launch failure in first_add.cu at line 182
+*** Trial 4 ***
+N: 8388608
+Timer: gettimeofday
+Timer resolution: ~ 1 us (?)
+Time to execute first add GPU reduction kernel: 3.1e-05 secs
+Effective bandwidth: 1082.40 GB/s
+unspecified launch failure in first_add.cu at line 182
+*** Trial 5 ***
+N: 8388608
+Timer: gettimeofday
+Timer resolution: ~ 1 us (?)
+Time to execute first add GPU reduction kernel: 2.8e-05 secs
+Effective bandwidth: 1198.37 GB/s
+unspecified launch failure in first_add.cu at line 182
+
+=== Done! ===

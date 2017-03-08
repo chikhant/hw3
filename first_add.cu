@@ -65,22 +65,21 @@ __global__ void kernel3(dtype *g_idata, dtype *g_odata, unsigned int n)
 
 	unsigned int bid = gridDim.x * blockIdx.y + blockIdx.x;
 	unsigned int i = bid * blockDim.x + threadIdx.x;
-	unsigned int length = blockDim.x/2;
+	unsigned int length = n/2;
 
-	if(i < n) {
-		if (threadIdx.x + length < blockDim.x)
-			scratch[threadIdx.x] = g_idata[i] + g_idata[i + length];
+	if(i < n/2) {
+		scratch[threadIdx.x] = g_idata[i] + g_idata[i + length];
 	} else {
 		scratch[threadIdx.x] = 0;
 	}
 	__syncthreads ();
 
-	for (unsigned int s = 1; s < length; s = s << 1)
+	for (unsigned int s = 1; s < blockDim.x; s = s << 1)
 	{
-		if(threadIdx.x < (length/(2*s))){
-			if (threadIdx.x + (length /(2*s)) < length)
+		if(threadIdx.x < (blockDim.x/(2*s))){
+			if (threadIdx.x + (blockDim.x /(2*s)) < blockDim.x)
 			{
-				scratch[threadIdx.x] += scratch[threadIdx.x + (length/ (2 * s))];
+				scratch[threadIdx.x] += scratch[threadIdx.x + (blockDim.x/ (2 * s))];
 			}
 		}
 
