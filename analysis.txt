@@ -201,5 +201,54 @@ SUCCESS: GPU: 41.946953  CPU: 41.946953
 
 === Done! ===
 
+
+
 Part 5)
+This part increased our effective bandwidth a lot! It is not all the way up to ~53 GB/s
+=== Running 5 trials of naive ... ===
+*** Trial 1 ***
+N: 8388608
+Timer: gettimeofday
+Timer resolution: ~ 1 us (?)
+Time to execute unrolled GPU reduction kernel: 0.000634 secs
+Effective bandwidth: 52.92 GB/s
+Time to execute naive CPU reduction: 0.145633 secs
+SUCCESS: GPU: 41.938660  CPU: 41.938660
+*** Trial 2 ***
+N: 8388608
+Timer: gettimeofday
+Timer resolution: ~ 1 us (?)
+Time to execute unrolled GPU reduction kernel: 0.000616 secs
+Effective bandwidth: 54.47 GB/s
+Time to execute naive CPU reduction: 0.116186 secs
+SUCCESS: GPU: 41.945763  CPU: 41.945763
+*** Trial 3 ***
+N: 8388608
+Timer: gettimeofday
+Timer resolution: ~ 1 us (?)
+Time to execute unrolled GPU reduction kernel: 0.000616 secs
+Effective bandwidth: 54.47 GB/s
+Time to execute naive CPU reduction: 0.116142 secs
+SUCCESS: GPU: 41.933842  CPU: 41.933842
+*** Trial 4 ***
+N: 8388608
+Timer: gettimeofday
+Timer resolution: ~ 1 us (?)
+Time to execute unrolled GPU reduction kernel: 0.000636 secs
+Effective bandwidth: 52.76 GB/s
+Time to execute naive CPU reduction: 0.099823 secs
+SUCCESS: GPU: 41.938114  CPU: 41.938114
+*** Trial 5 ***
+N: 8388608
+Timer: gettimeofday
+Timer resolution: ~ 1 us (?)
+Time to execute unrolled GPU reduction kernel: 0.000637 secs
+Effective bandwidth: 52.68 GB/s
+Time to execute naive CPU reduction: 0.116058 secs
+SUCCESS: GPU: 41.930855  CPU: 41.930855
+
+=== Done! ===
+
+
+
 Part 6)
