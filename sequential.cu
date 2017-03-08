@@ -75,9 +75,8 @@ __global__ void kernel2 (dtype *input, dtype *output, unsigned int n)
 	for (unsigned int s = 1; s < blockDim.x; s = s << 1)
 	{
 		// TODO: Figure out condition here
-		if (true)
-		{
-			if (threadIdx.x + (blockDim.x / s) < blockDim.x)
+		if(threadIdx.x < (blockDim.x/(2*s))){	
+			if (threadIdx.x + (blockDim.x /(2*s)) < blockDim.x)
 			{
 				scratch[threadIdx.x] += scratch[threadIdx.x + (blockDim.x / (2 * s))];
 			}
