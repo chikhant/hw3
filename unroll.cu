@@ -62,10 +62,43 @@ dtype reduce_cpu(dtype *data, int n) {
 __global__ void
 kernel4(dtype *g_idata, dtype *g_odata, unsigned int n)
 {
+    __shared__  volatile dtype scratch[MAX_THREADS];
+    unsigned int bid = gridDim.x * blockIdx.y + blockIdx.x;
+    unsigned int i = bid * blockDim.x + threadIdx.x;
+    unsigned int length = n/2;
+
+    if(i < ( n/2 )) {
+      scratch[threadIdx.x] = g_idata[i] + g_idata[i + length];
+    } else {
+      scratch[threadIdx.x] = 0;
+    }
+    __syncthreads ();
+
+    for(unsigned int s = blockDim.x / 2; s > 32; s = s >> 1) {
+      if( threadIdx.x < s ) {
+        scratch[ threadIdx.x ] += scratch[ threadIdx.x + s ];
+      }
+      __syncthreads ();
+    }
+
+    if (threadIdx.x < 32)
+    {
+      if(n > 64) {
+        scratch[threadIdx.x] += scratch[threadIdx.x + 32];
+		  }
+      if(n > 32) {
+        scratch[threadIdx.x] += scratch[threadIdx.x + 16];
+      }
+      scratch[threadIdx.x] += scratch[threadIdx.x + 8];
+      scratch[threadIdx.x] += scratch[threadIdx.x + 4];
+      scratch[threadIdx.x] += scratch[threadIdx.x + 2];
+      scratch[threadIdx.x] += scratch[threadIdx.x + 1];
+    }
+
+    if(threadIdx.x == 0) {
+      g_odata[bid] = scratch[0];
+    }
 }
-
-
-
 
 int 
 main(int argc, char** argv)
