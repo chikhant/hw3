@@ -15,60 +15,98 @@ typedef float dtype;
 
 /* return the next power of 2 number that is larger than x */
 unsigned int nextPow2( unsigned int x ) {
-    --x;
-    x |= x >> 1;
-    x |= x >> 2;
-    x |= x >> 4;
-    x |= x >> 8;
-    x |= x >> 16;
-    return ++x;
+	--x;
+	x |= x >> 1;
+	x |= x >> 2;
+	x |= x >> 4;
+	x |= x >> 8;
+	x |= x >> 16;
+	return ++x;
 }
 
 /* find out # of threads and # thread blocks for a particular kernel */
 void getNumBlocksAndThreads(int whichKernel, int n, int maxBlocks, int maxThreads, int &blocks, int &threads)
 {
-    if (whichKernel < 3)
-    {
-				/* 1 thread per element */
-        threads = (n < maxThreads) ? nextPow2(n) : maxThreads;
-        blocks = (n + threads - 1) / threads;
-    }
-    else
-    {
-				/* 1 thread per 2 elements */
-        threads = (n < maxThreads*2) ? nextPow2((n + 1)/ 2) : maxThreads;
-        blocks = (n + (threads * 2 - 1)) / (threads * 2);
-    }
-		/* limit the total number of threads */
-    if (whichKernel == 5)
-        blocks = MIN(maxBlocks, blocks);
+	if (whichKernel < 3)
+	{
+		/* 1 thread per element */
+		threads = (n < maxThreads) ? nextPow2(n) : maxThreads;
+		blocks = (n + threads - 1) / threads;
+	}
+	else
+	{
+		/* 1 thread per 2 elements */
+		threads = (n < maxThreads*2) ? nextPow2((n + 1)/ 2) : maxThreads;
+		blocks = (n + (threads * 2 - 1)) / (threads * 2);
+	}
+	/* limit the total number of threads */
+	if (whichKernel == 5)
+		blocks = MIN(maxBlocks, blocks);
 }
 
 /* special type of reduction to account for floating point error */
 dtype reduce_cpu(dtype *data, int n) {
-    dtype sum = data[0];
-    dtype c = (dtype)0.0;
-    for (int i = 1; i < n; i++)
-    {
-        dtype y = data[i] - c;
-        dtype t = sum + y;
-        c = (t - sum) - y;
-        sum = t;
-    }
-    return sum;
+	dtype sum = data[0];
+	dtype c = (dtype)0.0;
+	for (int i = 1; i < n; i++)
+	{
+		dtype y = data[i] - c;
+		dtype t = sum + y;
+		c = (t - sum) - y;
+		sum = t;
+	}
+	return sum;
 }
 
 
-__global__ void
-kernel5(dtype *g_idata, dtype *g_odata, unsigned int n)
+__global__ void kernel5(dtype *g_idata, dtype *g_odata, unsigned int n)
 {
+	__shared__  volatile dtype scratch[MAX_THREADS];
+	unsigned int bid = gridDim.x * blockIdx.y + blockIdx.x;
+	unsigned int i = bid * blockDim.x + threadIdx.x;
+	unsigned int length = n/512;
+
+	if(i < (n/512)) {
+		scratch[threadIdx.x] = g_idata[i];
+		for (int x = 1; x < 512; x++)
+		{
+			scratch[threadIdx.x] += g_idata[i + x*length];
+		}
+	} else {
+		scratch[threadIdx.x] = 0;
+	}
+	__syncthreads ();
+
+	for(unsigned int s = blockDim.x / 2; s > 32; s = s >> 1) {
+		if( threadIdx.x < s ) {
+			scratch[ threadIdx.x ] += scratch[ threadIdx.x + s ];
+		}
+		__syncthreads ();
+	}
+
+	if (threadIdx.x < 32)
+	{
+		if(n > 64) {
+			scratch[threadIdx.x] += scratch[threadIdx.x + 32];
+		}
+		if(n > 32) {
+			scratch[threadIdx.x] += scratch[threadIdx.x + 16];
+		}
+		scratch[threadIdx.x] += scratch[threadIdx.x + 8];
+		scratch[threadIdx.x] += scratch[threadIdx.x + 4];
+		scratch[threadIdx.x] += scratch[threadIdx.x + 2];
+		scratch[threadIdx.x] += scratch[threadIdx.x + 1];
+	}
+
+	if(threadIdx.x == 0) {
+		g_odata[bid] = scratch[0];
+	}
 }
 
 
 
 
-int 
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
 	int i;
 
@@ -86,19 +124,19 @@ main(int argc, char** argv)
 	/* number of threads and thread blocks */
 	int threads, blocks;
 
-  int N;
-  if(argc > 1) {
-    N = atoi (argv[1]);
-    printf("N: %d\n", N);
-  } else {
-    N = N_;
-    printf("N: %d\n", N);
-  }
+	int N;
+	if(argc > 1) {
+		N = atoi (argv[1]);
+		printf("N: %d\n", N);
+	} else {
+		N = N_;
+		printf("N: %d\n", N);
+	}
 
 	/* naive kernel */
 	whichKernel = 5;
 	getNumBlocksAndThreads (whichKernel, N, MAX_BLOCKS, MAX_THREADS, 
-													blocks, threads);
+			blocks, threads);
 
 	/* initialize timer */
 	stopwatch_init ();
@@ -115,8 +153,8 @@ main(int argc, char** argv)
 		h_idata[i] = drand48() / 100000;
 	}
 	CUDA_CHECK_ERROR (cudaMemcpy (d_idata, h_idata, N * sizeof (dtype), 
-																cudaMemcpyHostToDevice));
-	
+				cudaMemcpyHostToDevice));
+
 	/* ================================================== */
 	/* GPU kernel */
 	dim3 gb(blocks, 1, 1);
@@ -135,7 +173,7 @@ main(int argc, char** argv)
 		threads = 0;
 		blocks = 0;
 		getNumBlocksAndThreads (whichKernel, s, MAX_BLOCKS, MAX_THREADS, 
-														blocks, threads);
+				blocks, threads);
 
 		dim3 gb(blocks, 1, 1);
 		dim3 tb(threads, 1, 1);
@@ -149,12 +187,12 @@ main(int argc, char** argv)
 	t_kernel_5 = stopwatch_stop (timer);
 	fprintf (stdout, "Time to execute multiple add GPU reduction kernel: %Lg secs\n", t_kernel_5);
 
-  double bw = (N * sizeof(dtype)) / (t_kernel_5 * 1e9);
-  fprintf (stdout, "Effective bandwidth: %.2lf GB/s\n", bw);
+	double bw = (N * sizeof(dtype)) / (t_kernel_5 * 1e9);
+	fprintf (stdout, "Effective bandwidth: %.2lf GB/s\n", bw);
 
 	/* copy result back from GPU */
 	CUDA_CHECK_ERROR (cudaMemcpy (&h_odata, d_odata, sizeof (dtype), 
-																cudaMemcpyDeviceToHost));
+				cudaMemcpyDeviceToHost));
 	/* ================================================== */
 
 	/* ================================================== */
@@ -163,13 +201,13 @@ main(int argc, char** argv)
 	h_cpu = reduce_cpu (h_idata, N);
 	t_cpu = stopwatch_stop (timer);
 	fprintf (stdout, "Time to execute naive CPU reduction: %Lg secs\n",
-         	 t_cpu);
+			t_cpu);
 	/* ================================================== */
 
 	if(abs (h_odata - h_cpu) > 1e-5) {
-    fprintf(stderr, "FAILURE: GPU: %f  CPU: %f\n", h_odata, h_cpu);
+		fprintf(stderr, "FAILURE: GPU: %f  CPU: %f\n", h_odata, h_cpu);
 	} else {
-    printf("SUCCESS: GPU: %f  CPU: %f\n", h_odata, h_cpu);
+		printf("SUCCESS: GPU: %f  CPU: %f\n", h_odata, h_cpu);
 	}
 
 	return 0;
