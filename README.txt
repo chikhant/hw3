@@ -3,3 +3,5 @@ March 9, 2017
 
 Josue Galeas 72625644
 Anissa Tran 47098893
+
+Refer to 'ANALYSIS.txt' for our results.

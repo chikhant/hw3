@@ -66,14 +66,11 @@ __global__ void kernel5(dtype *g_idata, dtype *g_odata, unsigned int n)
 	unsigned int i = bid * blockDim.x + threadIdx.x;
 	unsigned int length = n/512;
 
-	if(i < (n/512)) {
-		scratch[threadIdx.x] = g_idata[i];
-		for (int x = 1; x < 512; x++)
-		{
-			scratch[threadIdx.x] += g_idata[i + x*length];
-		}
-	} else {
-		scratch[threadIdx.x] = 0;
+	scratch[threadIdx.x] = 0;
+	while (i < n/256)
+	{
+		scratch[threadIdx.x] += g_idata[i] + g_idata[i + length];
+		i += 512;
 	}
 	__syncthreads ();
 

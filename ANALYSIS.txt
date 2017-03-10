@@ -1,7 +1,7 @@
 Code Analysis
 =============
 
-Part 1)
+(Part 1)
 The data we recieved from running cuda.sh is below. Effective bandwidth is being calculated on this line of code in naive.cu:
 	double bw = (N * sizeof(dtype)) / (t_kernel_0 * 1e9);
 `N` is the size of the data, `dtype` is the datatype and it is divided by `t_kernel_0` which is the time to execute the naive GPU reduction kernel * 1000000000.
@@ -54,7 +54,7 @@ SUCCESS: GPU: 41.955299 	CPU: 41.955299
 
 
 
-Part 2)
+(Part 2)
 The following are the trial runs for stride.cu. This new model is about .0011 seconds quicker. Effective bandwidth has increased from around 10 GB/s to 15 GB/s.
 
 === Running 5 trials of naive ... ===
@@ -103,11 +103,10 @@ SUCCESS: GPU: 41.939648  CPU: 41.939644
 
 
 
-Part 3)
+
+
+(Part 3)
 We noticed a decrease in effective bandwidth but we have no errors and the code is running as it should be for this part. 
-Script began: Tue Mar 7 16:05:31 PST 2017
-Node: compute-1-14.local
-Current directory: /data/users/chikhant/hw3
 
 === Running 5 trials of naive ... ===
 *** Trial 1 ***
@@ -154,7 +153,10 @@ SUCCESS: GPU: 41.939636  CPU: 41.939632
 === Done! ===
 
 
-Part 4)
+
+
+
+(Part 4)
 So this part is definitely faster! It has gone up to 15.9 GB/s which is great news!
 
 === Running 5 trials of naive ... ===
@@ -203,8 +205,11 @@ SUCCESS: GPU: 41.946953  CPU: 41.946953
 
 
 
-Part 5)
-This part increased our effective bandwidth a lot! It is not all the way up to ~53 GB/s
+
+
+(Part 5)
+This part increased our effective bandwidth a lot! It is now all the way up to ~53 GB/s
+
 === Running 5 trials of naive ... ===
 *** Trial 1 ***
 N: 8388608
@@ -251,4 +256,6 @@ SUCCESS: GPU: 41.930855  CPU: 41.930855
 
 
 
-Part 6)
+
+
+(Part 6)
